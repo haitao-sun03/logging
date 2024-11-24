@@ -6,39 +6,28 @@ import (
 
 // LoggingConfig defines the configuration for logging
 type LoggingConfig struct {
-	Level   string         `mapstructure:"level"`
-	Format  string         `mapstructure:"format"`
-	Outputs []OutputConfig `mapstructure:"output"`
+	Level   string
+	Format  string
+	Outputs []OutputConfig
 }
 
 type OutputConfig struct {
-	Type       string `mapstructure:"type"`
-	Level      string `mapstructure:"level"`
-	Filename   string `mapstructure:"filename"`
-	MaxSize    int    `mapstructure:"maxSize"`
-	MaxBackups int    `mapstructure:"maxBackups"`
-	MaxAge     int    `mapstructure:"maxAge"`
-	Compress   bool   `mapstructure:"compress"`
+	Type       string
+	Level      string
+	Filename   string
+	MaxSize    int
+	MaxBackups int
+	MaxAge     int
+	Compress   bool
 }
 
 var config LoggingConfig
 
 // InitLogging initializes the logging configuration
 func InitLogging(_config LoggingConfig) {
-	// Set viper to read config file
-	// viper.SetConfigName("config")
-	// viper.SetConfigType("yaml")
-	// viper.AddConfigPath("./config")
-	// if err := viper.ReadInConfig(); err != nil {
-	// 	panic(fmt.Errorf("fatal error config file: %s", err))
-	// }
-
-	// if err := viper.UnmarshalKey("logging", &config); err != nil {
-	// 	panic(fmt.Errorf("unable to decode into struct, %v", err))
-	// }
-
+	//pass to here from bussiness module
 	config = _config
-	// Parse log level
+	// Parse logrus log level
 	level, err := log.ParseLevel(config.Level)
 	if err != nil {
 		panic(err)
@@ -52,7 +41,7 @@ func InitLogging(_config LoggingConfig) {
 		log.SetFormatter(&log.TextFormatter{})
 	}
 
-	// Configure hooks
+	//constrcut hook slice from configuration
 	hookLevels := []log.Level{}
 	for _, output := range config.Outputs {
 		if output.Type == "file" {
@@ -64,6 +53,7 @@ func InitLogging(_config LoggingConfig) {
 		}
 	}
 
+	// Configure hooks
 	log.AddHook(&LevelHook{
 		LevelSlices: hookLevels,
 	})
